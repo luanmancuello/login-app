@@ -1,0 +1,30 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Simples</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Bem-vindo</h1>
+    
+ <form id="formulario" method="post">
+      <input type="text" id="nome" name="nome" placeholder="Nome (cadastro)">
+      <input type="email" id="email" name="email" placeholder="Email">
+      <input type="password" id="senha" name="senha" placeholder="Senha">
+      
+      <div class="botoes">
+      <button type="button" onclick="cadastrar(event)">Cadastrar</button>
+
+      </div>
+    </form>
+
+    <p id="mensagem"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
