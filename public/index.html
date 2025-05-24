@@ -11,16 +11,23 @@
   <div class="container">
     <h1>Bem-vindo</h1>
     
- <form id="formulario" method="post">
-      <input type="text" id="nome" name="nome" placeholder="Nome (cadastro)">
-      <input type="email" id="email" name="email" placeholder="Email">
-      <input type="password" id="senha" name="senha" placeholder="Senha">
-      
-      <div class="botoes">
-      <button type="button" onclick="cadastrar(event)">Cadastrar</button>
-
-      </div>
-    </form>
+<form id="formulario" method="post">
+  <div style="position: relative;">
+    <input type="text" id="nome" name="nome" placeholder="Nome (cadastro)">
+    <span id="check-nome" class="checkmark"></span>
+  </div>
+  <div style="position: relative;">
+    <input type="email" id="email" name="email" placeholder="Email">
+    <span id="check-email" class="checkmark"></span>
+  </div>
+  <div style="position: relative;">
+    <input type="password" id="senha" name="senha" placeholder="Senha" maxlength="8">
+    <span id="check-senha" class="checkmark"></span>
+  </div>
+  <div class="botoes">
+    <button type="button" onclick="cadastrar(event)">Cadastrar</button>
+  </div>
+</form>
 
     <p id="mensagem"></p>
   </div>

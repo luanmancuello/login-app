@@ -52,3 +52,13 @@ button:hover {
   color: #333;
   min-height: 1.5em;
 }
+
+.checkmark {
+  position: absolute;
+  right: 11px;      /* valor positivo para alinhar à direita do input */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2em;
+  color: green;
+  pointer-events: none;
+}

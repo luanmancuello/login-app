@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
 
 const app = express();
-const url = 'mongodb://localhost:27017'; // URL do seu MongoDB local
+const url = process.env.MONGODB_URI;
 const dbName = 'loginapp'; // Nome do banco de dados
 let db;
 
@@ -25,7 +25,11 @@ app.post('/cadastro', async (req, res) => {
   // Validação Nubank/serviço bancário: nome completo, email válido, senha forte
   const nomeValido = typeof nome === 'string' && nome.trim().split(' ').length >= 2;
   const emailValido = typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const senhaValida = typeof senha === 'string' && senha.length >= 8 && /[A-Z]/.test(senha) && /[a-z]/.test(senha) && /\d/.test(senha);
+  const senhaValida = typeof senha === 'string'
+    && senha.length >= 8 && senha.length <= 8
+    && /[A-Z]/.test(senha)
+    && /[a-z]/.test(senha)
+    && /\d/.test(senha);
 
   if (!nomeValido) {
     return res.json({ erro: 'Informe o nome completo (nome e sobrenome).' });
