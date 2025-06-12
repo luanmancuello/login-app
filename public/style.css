@@ -1,51 +1,100 @@
+/* Reset básico */
 *,
 *::after,
 *::before {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-}
-body {
   margin: 0;
-  font-family: sans-serif;
-  background-color: #f4f4f4;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Estilo geral do body */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #e0e7ff, #fef9ff);
   display: flex;
-  height: 100vh;
   justify-content: center;
   align-items: center;
+  height: 100vh;
 }
 
+/* Container do formulário */
 .container {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 360px;
   text-align: center;
-  width: 300px;
+  transition: 0.3s ease;
 }
 
+h1 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.8rem;
+}
+
+/* Agrupamento de inputs */
+.form-group {
+  position: relative;
+  margin-bottom: 1.2rem;
+  text-align: left;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #444;
+}
+
+/* Inputs */
 input {
   width: 100%;
-  padding: 0.6rem;
-  margin: 0.5rem 0;
+  padding: 0.65rem 0.8rem;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
 }
 
-button {
-  padding: 0.6rem 1.2rem;
-  margin: 0.5rem;
+input:focus {
+  outline: none;
+  border-color: #5c67f2;
+}
+
+/* Placeholder */
+input::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+/* Corrige preenchimento automático do Chrome */
+input:-webkit-autofill {
+  box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #333 !important;
+  caret-color: #333 !important;
+}
+
+/* Botões */
+.botoes button {
+  width: 100%;
+  padding: 0.75rem;
   background-color: #5c67f2;
   color: white;
+  font-weight: 600;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-button:hover {
+.botoes button:hover {
   background-color: #3f47cc;
 }
 
+/* Feedback (mensagem de erro ou sucesso) */
 #mensagem {
   margin-top: 1rem;
   font-weight: bold;
@@ -53,9 +102,10 @@ button:hover {
   min-height: 1.5em;
 }
 
+/* Ícones de validação */
 .checkmark {
   position: absolute;
-  right: 11px;      /* valor positivo para alinhar à direita do input */
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.2em;

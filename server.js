@@ -1,69 +1,96 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
+const bcrypt = require('bcrypt');
 
 const app = express();
-const url = process.env.MONGODB_URI;
-const dbName = 'loginapp'; // Nome do banco de dados
+const PORT = 3000;
+const MONGODB_URI = process.env.MONGODB_URI;
+const DB_NAME = 'loginapp';
+
 let db;
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// Conexão com o MongoDB
-MongoClient.connect(url, { useUnifiedTopology: true })
+// Conectar ao MongoDB
+MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
   .then(client => {
-    db = client.db(dbName);
-    console.log('Conectado ao MongoDB');
+    db = client.db(DB_NAME);
+    console.log('✅ Conectado ao MongoDB');
   })
-  .catch(err => console.error(err));
+  .catch(err => {
+    console.error('Erro ao conectar ao MongoDB:', err);
+    process.exit(1);
+  });
 
-// Rota de cadastro
-app.post('/cadastro', async (req, res) => {
-  const { nome, email, senha } = req.body;
-
-  // Validação Nubank/serviço bancário: nome completo, email válido, senha forte
-  const nomeValido = typeof nome === 'string' && nome.trim().split(' ').length >= 2;
-  const emailValido = typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const senhaValida = typeof senha === 'string'
-    && senha.length >= 8 && senha.length <= 8
+// 🔒 Funções de validação
+function validarNome(nome) {
+  return typeof nome === 'string' && nome.trim().split(' ').length >= 2;
+}
+function validarEmail(email) {
+  return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+function validarSenha(senha) {
+  return typeof senha === 'string'
+    && senha.length === 8
     && /[A-Z]/.test(senha)
     && /[a-z]/.test(senha)
     && /\d/.test(senha);
+}
 
-  if (!nomeValido) {
-    return res.json({ erro: 'Informe o nome completo (nome e sobrenome).' });
-  }
-  if (!emailValido) {
-    return res.json({ erro: 'Informe um email válido.' });
-  }
-  if (!senhaValida) {
-    return res.json({ erro: 'A senha deve ter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas e números.' });
-  }
+// 📥 Rota de cadastro
+app.post('/cadastro', async (req, res) => {
+  const { nome, email, senha } = req.body;
+
+  if (!validarNome(nome)) return res.status(400).json({ erro: 'Informe o nome completo.' });
+  if (!validarEmail(email)) return res.status(400).json({ erro: 'Email inválido.' });
+  if (!validarSenha(senha)) return res.status(400).json({ erro: 'Senha fraca. Use 8 caracteres com maiúsculas, minúsculas e números.' });
 
   try {
-    await db.collection('usuarios').insertOne({ nome: nome.trim(), email: email.trim(), senha });
-    res.json({ mensagem: 'Usuário cadastrado com sucesso!' });
+    const existente = await db.collection('usuarios').findOne({ email: email.trim() });
+    if (existente) return res.status(400).json({ erro: 'Email já cadastrado.' });
+
+    const senhaHash = await bcrypt.hash(senha, 10);
+
+    await db.collection('usuarios').insertOne({
+      nome: nome.trim(),
+      email: email.trim(),
+      senha: senhaHash,
+    });
+
+    console.log(`🟢 Novo usuário: ${nome.trim()} (${email.trim()})`);
+    res.status(201).json({ mensagem: 'Usuário cadastrado com sucesso!' });
   } catch (err) {
-    res.json({ erro: 'Erro ao cadastrar usuário.' });
-  }
-});
-// Rota de login
-app.post('/login', async (req, res) => {
-  const { email, senha } = req.body;
-  const usuario = await db.collection('usuarios').findOne({ email, senha });
-  if (usuario) {
-    res.json({ mensagem: 'Login realizado com sucesso!' });
-  } else {
-    res.json({ erro: 'Email ou senha incorretos.' });
+    console.error('Erro no cadastro:', err);
+    res.status(500).json({ erro: 'Erro interno ao cadastrar usuário.' });
   }
 });
 
-// Rota para servir o arquivo index.html
+// 🔐 Rota de login
+app.post('/login', async (req, res) => {
+  const { email, senha } = req.body;
+
+  try {
+    const usuario = await db.collection('usuarios').findOne({ email: email.trim() });
+    if (!usuario) return res.status(401).json({ erro: 'Email ou senha incorretos.' });
+
+    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+    if (!senhaCorreta) return res.status(401).json({ erro: 'Email ou senha incorretos.' });
+
+    res.status(200).json({ mensagem: 'Login realizado com sucesso!' });
+  } catch (err) {
+    console.error('Erro no login:', err);
+    res.status(500).json({ erro: 'Erro interno no login.' });
+  }
+});
+
+// Página principal
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-app.listen(3000, () => {
-  console.log('Servidor rodando em http://localhost:3000');
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });
